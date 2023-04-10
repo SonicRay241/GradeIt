@@ -49,8 +49,8 @@ export const actions = {
                     throw error(400, { message: "Invalid credentials" })
                 }
 			}
-			console.error(err)
-			return fail(400, { message: "Could not login user." })
+			console.log(err)
+			return fail(500, { message: "Could not login user." })
 		}
 		throw redirect(302, "/home/dashboard")
 	},
