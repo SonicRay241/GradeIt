@@ -51,29 +51,14 @@ model Key {
   @@map("key")
 }
 
-model Students {
-  id    Int    @id @default(autoincrement())
-  name  String
-  nis   Int    @unique
-  class String
-
-  @@map("students")
-}
-
-model Classes {
-  id   Int    @id @default(autoincrement())
-  name String
-
-  @@map("classes")
-}
-
 model Courses {
   id          Int    @id @default(autoincrement())
-  urlID       String
-  name        String
-  className   String
+  urlID       String @unique
+  class       String
+  subject     String
   teacherName String
-  kkm         Int
+  teacherId   String
+  kkm         String
 
   @@map("courses")
 }
@@ -81,6 +66,7 @@ model Courses {
 model CourseWork {
   id          Int    @id @default(autoincrement())
   name        String
+  courseId    Int
   studentName String
   studentNis  String
   grade       Int

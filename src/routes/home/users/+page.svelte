@@ -125,9 +125,13 @@
                     {/if}
                 </div>
 
-                <input type="text" name="level" id="level" class="hidden" bind:value={levelValue}>
-                
-                <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create User</button>
+                <input type="text" name="level" id="level" class="hidden" bind:value={levelValue} required>
+                {#if levelValue == "Select"}
+                <button type="button" on:click={() => alert("Please fill the form")} class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create Course</button>
+                {:else}
+                <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create Course</button>
+                {/if}
+                <!-- <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create User</button> -->
             </form>
         </div>
     </div>
@@ -178,7 +182,7 @@
 </div>
 {/if}
 
-<div class="ml-20 mt-3 p-5 md:p-10 xl:p-20">
+<div class="ml-16 mt-3 p-5 md:p-10 xl:p-20">
     <h1 class="text-4xl font-semibold mb-10 2xl:mx-56">Users</h1>
     <Table Class="2xl:mx-56">
         <TableHead>

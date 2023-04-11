@@ -6,13 +6,14 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     if ( !session ) {
         throw redirect(302, "/login")
     }
-    if (params.slug === "AMOGUS") {
-        return {
-            message: params.slug
+    const urmom = await prisma.courses.findUnique({
+        where: {
+            urlID: params.slug
         }
-    }
-    return {
-        message: "404"
+    })
+
+    if (!urmom) {
+        throw error(404, "Course not found")
     }
 }
     
