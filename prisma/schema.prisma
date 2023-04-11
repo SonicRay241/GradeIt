@@ -15,6 +15,7 @@ model User {
 
   username String @unique
   name     String
+  class    String?
   level    Level  @default(GURU)
 
   Session Session[]
@@ -26,6 +27,7 @@ model User {
 enum Level {
   ADMIN
   GURU
+  WALAS
 }
 
 model Session {
@@ -61,6 +63,12 @@ model Courses {
   kkm         String
 
   @@map("courses")
+}
+
+model Assignments {
+  id Int @id @default(autoincrement())
+  name String
+  urlID String
 }
 
 model CourseWork {

@@ -8,6 +8,7 @@
     let classValue = "Select"
 
     const hideAddModal = () => {
+        classValue = "Select"
         addModalState = false
     }
 
