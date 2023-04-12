@@ -22,12 +22,19 @@ export const load = (async ({ locals }) => {
 
 export const actions = {
     createUser:async ({ request }) => {
-        const { name, username, password, level } = Object.fromEntries(await request.formData()) as {
+        let { name, username, classname, password, level } = Object.fromEntries(await request.formData()) as {
             name: string,
             username: string,
+            classname: string,
             password: string,
             level: string
         } as Record<string, string>
+
+        if (level == "WALAS") {
+            level = "GURU"
+        } else {
+            classname = ""
+        }
 
         try {
             await auth.createUser({
@@ -37,6 +44,7 @@ export const actions = {
                     password: password
                 },
                 attributes: {
+                    class: classname,
                     name,
                     username,
                     level
@@ -61,15 +69,23 @@ export const actions = {
         }
     },
     updateUser:async ({ request }) => {
-        const { uid, name, level } = await Object.fromEntries(await request.formData()) as {
-            uid: string
-            name: string
-            level: string
+        let { uid, name, classname, level } = await Object.fromEntries(await request.formData()) as {
+            uid: string,
+            name: string,
+            classname: string,
+            level: string,
         } as Record<string, string>
+
+        if (level == "WALAS") {
+            level = "GURU"
+        } else {
+            classname = ""
+        }
 
         try {
             await auth.updateUserAttributes(uid, {
                 name,
+                class: classname,
                 level
             })
         } catch (err) {

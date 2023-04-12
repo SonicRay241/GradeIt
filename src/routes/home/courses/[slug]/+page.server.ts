@@ -22,6 +22,7 @@ export const load = (async ({ params, locals }) => {
     })
 
     return {
+        courses,
         assignments
     }
 

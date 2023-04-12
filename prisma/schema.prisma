@@ -27,7 +27,6 @@ model User {
 enum Level {
   ADMIN
   GURU
-  WALAS
 }
 
 model Session {
@@ -69,15 +68,25 @@ model Assignments {
   id Int @id @default(autoincrement())
   name String
   urlID String
+
+  @@map("assignments")
 }
 
-model CourseWork {
+model Grades {
+  id Int @id @default(autoincrement())
+  urlID String
+  assignmentID Int
+  score Int
+
+  @@map("grades")
+}
+
+model Students {
   id          Int    @id @default(autoincrement())
   name        String
-  courseId    Int
+  urlID       String
   studentName String
   studentNis  String
-  grade       Int
 
   @@map("coursework")
 }

@@ -13,6 +13,7 @@
     let updateModalState = false
     let dropdownState = false
     let levelValue = "Select"
+    let homeroom = false
     let updateModalData: any | null
 
     const showDeleteModal = (id: string) => {
@@ -30,18 +31,23 @@
     }
 
     const hideAddModal = () => {
+        homeroom = false
         levelValue = "Select"
         addModalState = false
     }
 
     const showUpdateModal = (id: string, updateData:any) => {
         levelValue = updateData["level"]
+        if (updateData["class"] != "") {
+            levelValue = "WALAS"
+        }
         updateModalData = updateData
         selectedUserId = id
         updateModalState = true
     }
 
     const hideUpdateModal = () => {
+        homeroom = false
         levelValue = "Select"
         updateModalData = null
         selectedUserId = ""
@@ -102,6 +108,12 @@
                     <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
                     <input type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Adam" required>
                 </div>
+                {#if levelValue == "WALAS"}
+                <div>
+                    <label for="classname" class="block mb-2 text-sm font-medium text-gray-900">Class</label>
+                    <input type="text" name="classname" id="classname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="X TKJ" required>
+                </div>
+                {/if}
                 <div>
                     <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
                     <input type="text" name="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="••••••••" required>
@@ -119,6 +131,9 @@
                           </li>
                           <li>
                             <button on:click={() => {levelValue = "GURU"}} on:keydown={() => {levelValue = "GURU"}} type="button" class="block px-4 py-2 w-full hover:bg-gray-100 text-left">GURU</button>
+                          </li>
+                          <li>
+                            <button on:click={() => {levelValue = "WALAS"}} on:keydown={() => {levelValue = "WALAS"}} type="button" class="block px-4 py-2 w-full hover:bg-gray-100 text-left">WALAS</button>
                           </li>
                         </ul>
                     </div>
@@ -153,6 +168,12 @@
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
                     <input bind:value={updateModalData["name"]} type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Adam Williams" required>
                 </div>
+                {#if levelValue == "WALAS"}
+                <div>
+                    <label for="classname" class="block mb-2 text-sm font-medium text-gray-900">Class</label>
+                    <input bind:value={updateModalData["class"]} type="text" name="classname" id="classname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="X TKJ" required>
+                </div>
+                {/if}
                 <div>
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label class="block mb-2 text-sm font-medium text-gray-900">Level</label>
@@ -166,6 +187,9 @@
                           </li>
                           <li>
                             <button on:click={() => {levelValue = "GURU"}} on:keydown={() => {levelValue = "GURU"}} type="button" class="block px-4 py-2 w-full hover:bg-gray-100 text-left">GURU</button>
+                          </li>
+                          <li>
+                            <button on:click={() => {levelValue = "WALAS"}} on:keydown={() => {levelValue = "WALAS"}} type="button" class="block px-4 py-2 w-full hover:bg-gray-100 text-left">WALAS</button>
                           </li>
                         </ul>
                     </div>
@@ -188,6 +212,7 @@
         <TableHead>
             <TableHeadChild label="Nama"/>
             <TableHeadChild label="Level"/>
+            <TableHeadChild label="Kelas"/>
             <TableHeadChild label="" buttons>
                 <button on:click={showAddModal} class="flex justify-center items-center hover:bg-slate-200 w-8 h-8 rounded">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -197,7 +222,7 @@
             </TableHeadChild>
         </TableHead>
         <TableBody>
-            <TableBodyChild name="{user.name}" data="{user.level}" editable>
+            <TableBodyChild name="{user.name}" data="{user.level},{user.class}" editable>
                 <div class="flex items-center justify-end">
                     <button class="flex justify-center items-center bg-indigo-500 hover:bg-indigo-600 w-10 h-10 mx-2 text-white rounded">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -208,7 +233,7 @@
             </TableBodyChild>
             {#each userlist as a}
             {#if user.name != a.name}
-            <TableBodyChild name="{a.name}" data="{a.level}" editable>
+            <TableBodyChild name="{a.name}" data="{a.level},{a.class}" editable>
                 <div class="flex items-center justify-end">
                     <button on:click={() => showUpdateModal(a.id, a)} class="flex justify-center items-center bg-indigo-500 hover:bg-indigo-600 w-10 h-10 mx-2 text-white rounded">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">

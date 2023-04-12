@@ -24,6 +24,7 @@ export const load = (async ({ locals }) => {
                 attributes: {
                     name: "root",
                     username: "root",
+                    class: "",
                     level: "ADMIN"
                 }
             })

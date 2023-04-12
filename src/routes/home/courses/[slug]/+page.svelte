@@ -18,7 +18,7 @@
     const hideAddModal = () => {
         addModalState = false
     }
-    $: ({ assignments } = data)
+    $: ({ assignments, courses } = data)
 </script>
 
 {#if addModalState}
@@ -46,7 +46,8 @@
 {/if}
 
 <div class="ml-16 mt-3 p-5 md:p-10 xl:p-20">
-    <h1 class="text-4xl font-semibold mb-10">Grades</h1>
+    <h1 class="text-4xl font-semibold mb-2">{courses.class}</h1>
+    <h1 class="text-xl mb-10">Subject: {courses.subject}</h1>
     <Table>
         <TableHead>
             <TableHeadChild label="Name"/>
