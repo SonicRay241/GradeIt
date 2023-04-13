@@ -1,6 +1,7 @@
 <script lang="ts">
     import ClassCard from "$lib/components/ClassCard.svelte";
-    import { fade, scale } from "svelte/transition"
+    import { fade, scale, fly } from "svelte/transition"
+    import { cubicInOut } from "svelte/easing";
     import type { PageData } from "./$types";
 
     let addModalState = false
@@ -82,7 +83,7 @@
 </div>
 {/if}
 
-<main class="ml-20 h-full">
+<main class="ml-20 h-full" in:fly="{{x:100, easing:cubicInOut, delay: 200}}" out:fly="{{x:100, easing:cubicInOut, duration:200}}">
     <div class="2xl:px-20 xl:px-15 lg:px-10 px-5 2xl:pt-20 xl:pt-15 lg:pt-10 pt-5 mb-10">
         <h1 class="text-4xl font-semibold mb-4">Courses</h1>
         <button on:click={showAddModal} class="flex justify-center items-center hover:bg-slate-200 w-20 h-8 rounded">

@@ -4,9 +4,11 @@
     import TableHeadChild from "$lib/components/TableHeadChild.svelte";
     import TableBody from "$lib/components/TableBody.svelte";
     import TableBodyChild from "$lib/components/TableBodyChild.svelte";
+    import { fly } from "svelte/transition";
+    import { cubicInOut } from "svelte/easing";
 </script>
 
-<div class="ml-20 mt-3 p-5 md:p-10 xl:p-20">
+<div class="ml-20 mt-3 p-5 md:p-10 xl:p-20" in:fly="{{x:100, easing:cubicInOut, delay: 200}}" out:fly="{{x:100, easing:cubicInOut, duration:200}}">
     <h1 class="text-4xl font-semibold mb-16">Classes</h1>
         <Table Class="mx-56">
             <TableHead>

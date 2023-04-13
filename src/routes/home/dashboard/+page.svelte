@@ -1,5 +1,7 @@
 <script lang='ts'>
     import ClassCard from "$lib/components/ClassCard.svelte";
+    import { fly } from "svelte/transition";
+    import { cubicInOut } from "svelte/easing";
     import type { PageData } from "./$types"
 
     export let data: PageData
@@ -7,7 +9,7 @@
     $: ({ user, time } = data)
 </script>
 
-<div class="ml-20 mt-3 p-5 md:p-10 xl:p-20">
+<div class="ml-20 mt-3 p-5 md:p-10 xl:p-20" in:fly="{{x:100, easing:cubicInOut, delay: 200}}" out:fly="{{x:100, easing:cubicInOut, duration:200}}">
     <p class="text-5xl font-semibold text-gray-800 mb-10 sm:mb-20">
         Good {time}, {user.name}!
     </p>
