@@ -21,9 +21,23 @@ export const load = (async ({ params, locals }) => {
         }
     })
 
+    const grades = await prisma.grades.findMany({
+        where: {
+            urlID: params.slug
+        }
+    })
+
+    const students = await prisma.students.findMany({
+        where: {
+            urlID: params.slug
+        }
+    })
+
     return {
         courses,
-        assignments
+        assignments,
+        grades,
+        students
     }
 
 }) satisfies PageServerLoad
@@ -63,6 +77,48 @@ export const actions = {
         } catch (err) {
             console.log(err);
             return fail(500, {message: "Failed to create a new student"})
+        }
+    },
+    createOrUpdateGrade:async ({ params, request }) => {
+        const { grade, studentId, assignmentId} = Object.fromEntries(
+            await request.formData()
+        ) as Record<string, string>
+
+        const gradeData = await prisma.grades.findFirst({
+            where: {
+                assignmentID: +assignmentId,
+                studentID: +studentId
+            }
+        })
+
+        if (!gradeData) {
+            try {
+                await prisma.grades.create({
+                    data:{
+                        urlID: params.slug,
+                        assignmentID: +assignmentId,
+                        studentID: +studentId,
+                        score: +grade
+                    }
+                })
+            } catch (err) {
+                console.log(err);
+                return fail(500, { message: "Failed to create grade"})
+            }
+        } else {
+            try {
+                await prisma.grades.update({
+                    where: {
+                        id: gradeData.id
+                    },
+                    data: {
+                        score: +grade
+                    }
+                })
+            } catch (err) {
+                console.log(err);
+                return fail(500, { message: "Failed to update grade"})
+            }
         }
     }
 } satisfies Actions
