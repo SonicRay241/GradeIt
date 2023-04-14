@@ -45,6 +45,25 @@ export const actions = {
             console.log(err);
             return fail(500, {message: "Failed to create a new assignment"})
         }
+    },
+    createStudent:async ({ params, request }) => {
+        const { name, nis } = Object.fromEntries(await request.formData()) as {
+            name: string,
+            nis: string
+        } as Record<string, string>
+
+        try {
+            await prisma.students.create({
+                data: {
+                    name,
+                    studentNis: nis,
+                    urlID: params.slug,
+                }
+            })
+        } catch (err) {
+            console.log(err);
+            return fail(500, {message: "Failed to create a new student"})
+        }
     }
 } satisfies Actions
     

@@ -85,8 +85,7 @@ model Students {
   id          Int    @id @default(autoincrement())
   name        String
   urlID       String
-  studentName String
   studentNis  String
 
-  @@map("coursework")
+  @@map("students")
 }
