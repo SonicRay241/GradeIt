@@ -13,11 +13,10 @@
     let addModalState = false
     let addUserState = false
     let gradeModalState = false
+    let gradeModalValue = ""
 
     let selectedStudentId = ""
     let selectedAssignmentId = ""
-
-    let assignmentIdList = []
 
     const showAddModal = () => {
         addModalState = true
@@ -37,14 +36,9 @@
 
     $: ({ assignments, courses, grades, students } = data)
 
-    // if (assignments) {
-    //     for (let i = 0; i < assignments.length; i++) {
-    //         assignmentIdList.push(assignments[i].id)
-    //     }
-    // }
-
-    const showGradeModal = (studentId: any, assignmentId: any) => {
+    const showGradeModal = (studentId: any, assignmentId: any, value: any) => {
         gradeModalState = true
+        gradeModalValue = value
         selectedAssignmentId = assignmentId
         selectedStudentId = studentId
     }
@@ -77,6 +71,7 @@
 
     const hideGradeModal = () => {
         gradeModalState = false
+        gradeModalValue = ""
         selectedAssignmentId = ""
         selectedStudentId = ""
     }
@@ -94,13 +89,18 @@
             <form method="POST" class="space-y-6" action="?/createOrUpdateGrade">
                 <div>
                     <!-- <label for="grade" class="block mb-2 text-sm font-medium text-gray-900">Assignment name</label> -->
-                    <input type="text" name="grade" id="grade" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="100" required>
+                    <input type="number" name="grade" id="grade" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="100" bind:value={gradeModalValue} required>
                 </div>
 
                 <input type="text" name="assignmentId" id="assignmentId" bind:value={selectedAssignmentId} hidden>
                 <input type="text" name="studentId" id="studentId" bind:value={selectedStudentId} hidden>
 
-                <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create Course</button>
+                {#if +gradeModalValue > 100}
+                <button type="button" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" on:click={() => alert("Must have valid score")}>Create Course</button>
+                {:else}
+                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create Course</button>
+                {/if}
+
                 <!-- <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create User</button> -->
             </form>
         </div>
@@ -188,15 +188,41 @@
             {#each students as student}
             <TableGrade name="{student.name}" nis={student.studentNis}>
                 {#each assignments as assignment}
-                    <td class="px-6 py-4">
-                        <button type="button" on:click={() => showGradeModal(student.id, assignment.id)}>
-                            {getGrade(student.id, assignment.id)}
-                        </button>
+                    {@const grade = getGrade(student.id, assignment.id)}
+                    {#if grade < +(courses.kkm)}
+                    <td class="group px-6 py-4 cursor-pointer bg-red-400 text-gray-100 hover:bg-red-500 hover:text-gray-50" on:click={() => showGradeModal(student.id, assignment.id, grade)} on:keydown={() => showGradeModal(student.id, assignment.id, grade)}>
+                        <div class="flex flex-row">
+                            {grade}
+                            <div class="flex justify-end w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-red-400 group-hover:text-gray-50">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                </svg>
+                            </div>
+                        </div>
                     </td>
+                    {:else}
+                    <td class="group px-6 py-4 cursor-pointer hover:bg-gray-300 hover:text-gray-500" on:click={() => showGradeModal(student.id, assignment.id, grade)} on:keydown={() => showGradeModal(student.id, assignment.id, grade)}>
+                        <div class="flex flex-row">
+                            {grade}
+                            <div class="flex justify-end w-full">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-white group-hover:text-gray-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                                </svg>
+                            </div>
+                        </div>                      
+                    </td>
+                    {/if}
                 {/each}
-                <td class="px-6 py-4">
-                    {getGradeAvg(student.id)}
-                </td>
+                {@const avg = getGradeAvg(student.id)}
+                {#if avg < courses.kkm }
+                    <td class="px-6 py-4 bg-red-400 text-gray-100">
+                        {avg}
+                    </td>
+                {:else}
+                    <td class="px-6 py-4">
+                        {avg}
+                    </td>
+                {/if}
             </TableGrade>
             {/each}
         </TableBody>

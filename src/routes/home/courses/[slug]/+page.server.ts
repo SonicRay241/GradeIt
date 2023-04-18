@@ -15,6 +15,10 @@ export const load = (async ({ params, locals }) => {
         throw error(404, "Course not found")
     }
 
+    if (courses.teacherId != user.userId) {
+        throw error(403, "Access not allowed")
+    }
+
     const assignments = await prisma.assignments.findMany({
         where: {
             urlID: params.slug
