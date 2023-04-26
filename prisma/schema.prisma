@@ -18,6 +18,7 @@ model User {
   class    String?
   level    Level  @default(GURU)
 
+  Courses Courses[]
   Session Session[]
   Key     Key[]
 
@@ -61,13 +62,24 @@ model Courses {
   teacherId   String
   kkm         String
 
+  Grades Grades[]
+  Assignments Assignments[]
+  avgResult avgResult[]
+
+  User User @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
   @@map("courses")
 }
 
 model Assignments {
   id Int @id @default(autoincrement())
   name String
+  type AssignmentType
   urlID String
+
+  Grades Grades[]
+
+  Courses Courses @relation(fields: [urlID], references: [urlID], onDelete: Cascade)
 
   @@map("assignments")
 }
@@ -76,10 +88,19 @@ model Grades {
   id Int @id @default(autoincrement())
   urlID String
   assignmentID Int
+  type AssignmentType
   studentID Int
   score Int
 
+  Courses Courses @relation(fields: [urlID], references: [urlID], onDelete: Cascade)
+  Students Students @relation(fields: [studentID], references: [id], onDelete: Cascade)
+  Assignments Assignments @relation(fields: [assignmentID], references: [id], onDelete: Cascade)
+
   @@map("grades")
+}
+enum AssignmentType {
+  TUGAS
+  ULANGAN
 }
 
 model Students {
@@ -88,5 +109,24 @@ model Students {
   urlID       String
   studentNis  String
 
+  Grades Grades[]
+  avgResult avgResult[]
+  
+
   @@map("students")
+}
+
+model avgResult {
+  id Int @id @default(autoincrement())
+  courseId Int
+  coursename String
+  studentId Int @unique
+  studentName String
+  studentNis String
+  taskRemed Boolean
+  testRemed Boolean
+  teacherName String
+
+  Courses Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  Students Students @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }

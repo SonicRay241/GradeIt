@@ -1,6 +1,6 @@
 <main class="flex items-center justify-center h-screen md:px-64 md:py-32">
     <div class="grid grid-cols-3 w-full h-full p-0 bg-white border border-gray-200 rounded-2xl shadow">
-        <div class="col-span-1 bg-indigo-700 rounded-2xl shadow hidden md:block"/>
+        <div class="col-span-1 bg-indigo-500 rounded-2xl shadow hidden md:block"/>
         <div class="col-span-2 pt-8 pl-8 md:p-16 xl:p-20 w-full">
             <h1 class="text-5xl font-semibold text-gray-800">
                 Login

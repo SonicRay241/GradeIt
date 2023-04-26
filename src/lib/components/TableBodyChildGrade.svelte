@@ -1,10 +1,10 @@
 <script lang='ts'>
-    import type { GradeData } from "$lib/types";
+    import type { avgResult } from "@prisma/client";
 
     export let index: number
     export let name: string
     export let nis: string
-    export let data: GradeData[]
+    export let data: avgResult[]
 </script>
 
 {#each data as e, i}
@@ -31,9 +31,9 @@
     </td>
     {/if}
     <td class="px-6 py-4 text-gray-600">
-        {e.course}
+        {e.coursename}
     </td>
-    {#if e.coursework}
+    {#if e.taskRemed}
     <td class="px-6 py-4 text-gray-600">
         REMED
     </td>
@@ -42,7 +42,7 @@
         -
     </td>
     {/if}
-    {#if e.exam}
+    {#if e.testRemed}
     <td class="px-6 py-4 text-gray-600">
         REMED
     </td>

@@ -3,6 +3,8 @@
     import { fade, scale, fly } from "svelte/transition"
     import { cubicInOut } from "svelte/easing";
     import type { PageData } from "./$types";
+    import { enhance, type SubmitFunction } from "$app/forms";
+    import toast, { Toaster } from "svelte-french-toast";
 
     let addModalState = false
     let dropdownState = false
@@ -19,11 +21,37 @@
 
     const toggleDropdown = () => { dropdownState = dropdownState ? false : true };
 
+    const onAddCourse: SubmitFunction = ({ form, data, action, submitter, cancel }) => {
+        const { major, subject, kkm, classs } = Object.fromEntries(data)
+
+        if (major == "" || subject == "" || kkm == "" || classs == "Select") {
+            toast.error("Please fill the form")
+            cancel()
+        }
+
+        return async ({ result, update }) => {
+            switch (result.type){
+                case 'success':
+                    toast.success("Added assignment!")
+                    break
+                case 'error':
+                    toast.error("Failed to add assignment")
+                    break
+                default:
+                    break
+            }
+            hideAddModal()
+            await update()
+        }
+    }
+
     export let data: PageData;
 
     $: ({ courses } = data)
     
 </script>
+
+<Toaster/>
 
 {#if addModalState}
 <div class="flex justify-center items-center fixed h-full w-full backdrop-blur-md z-50" transition:fade>
@@ -35,7 +63,7 @@
         </button>
         <div class="px-6 py-6 lg:px-8">
             <h3 class="mb-4 text-xl font-medium text-gray-900">Add Course</h3>
-            <form method="POST" class="space-y-6" action="?/createCourse">
+            <form method="POST" class="space-y-6" action="?/createCourse" use:enhance = {onAddCourse}>
                 <div>
                     <!-- svelte-ignore a11y-label-has-associated-control -->
                     <label class="block mb-2 text-sm font-medium text-gray-900">Class</label>
@@ -59,24 +87,20 @@
                 </div>
                 <div>
                     <label for="major" class="block mb-2 text-sm font-medium text-gray-900">Major</label>
-                    <input type="text" name="major" id="major" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Class Major" required>
+                    <input type="text" name="major" id="major" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Class Major">
                 </div>
                 <div>
                     <label for="subject" class="block mb-2 text-sm font-medium text-gray-900">Subject</label>
-                    <input type="text" name="subject" id="subject" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="School Subject" required>
+                    <input type="text" name="subject" id="subject" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="School Subject">
                 </div>
                 <div>
                     <label for="kkm" class="block mb-2 text-sm font-medium text-gray-900">KKM</label>
-                    <input type="number" name="kkm" id="kkm" class="mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="50" required>
+                    <input type="number" name="kkm" id="kkm" class="mb-4 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="50">
                 </div>
 
-                <input type="text" name="classs" id="classs" class="hidden" bind:value={classValue} required/>
+                <input type="text" name="classs" id="classs" class="hidden" bind:value={classValue}/>
                 
-                {#if classValue == "Select"}
-                <button type="button" on:click={() => alert("Please fill the form")} class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create Course</button>
-                {:else}
                 <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create Course</button>
-                {/if}
             </form>
         </div>
     </div>

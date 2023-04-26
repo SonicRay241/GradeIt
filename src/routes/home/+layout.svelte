@@ -7,7 +7,6 @@
 
   export let data: LayoutData;
 </script>
-
 <main>
     <nav class="fixed top-0 z-40 w-full bg-gradient-to-r from-indigo-700 via-purple-900 to-red-500">
         <div class="px-3 py-3 lg:px-5 lg:pl-3">

@@ -8,6 +8,8 @@
     import { fly } from "svelte/transition";
     import { cubicInOut } from "svelte/easing";
     import { fade, scale } from "svelte/transition"
+    import { enhance, type SubmitFunction } from "$app/forms";
+    import toast, { Toaster } from "svelte-french-toast"
 
     let selectedUserId = ""
     let deleteModalState = false
@@ -17,6 +19,7 @@
     let levelValue = "Select"
     let homeroom = false
     let updateModalData: any | null
+    let search = ""
 
     const showDeleteModal = (id: string) => {
         selectedUserId = id
@@ -58,11 +61,100 @@
 
     const toggleDropdown = () => { dropdownState = dropdownState ? false : true }
 
+    const onDelete: SubmitFunction = ({ form, data, action, submitter, cancel }) => {
+        return async ({ result, update }) => {
+            switch (result.type){
+                case 'success':
+                    toast.success("Deleted user!")
+                    break
+                case 'error':
+                    toast.error("Failed to delete user")
+                    break
+                default:
+                    break
+            }
+
+            hideDeleteModal()
+            await update()
+        }
+    }
+
+    const onAdd: SubmitFunction = ({ form, data, action, submitter, cancel }) => {
+        const { name, username, classname, password, level } = Object.fromEntries(data)
+
+        if (name == "" || username == "" || password == "" || level == "Select") {
+            toast.error("Please fill out the form")
+            cancel()
+        }
+
+        if (level == "WALAS" && classname == "") {
+            toast.error("Please fill the class input")
+            cancel()
+        }
+
+        if (password.length < 6) {
+            toast.error("Password must be at least 6 characters long")
+            cancel()
+        }
+
+        for (let users of userlist) {
+            if (users.username == username) {
+                toast.error("Username already been used")
+                cancel()
+            }
+        }
+
+        return async ({ result, update }) => {
+            switch (result.type){
+                case 'success':
+                    toast.success("Created user!")
+                    break
+                case 'error':
+                    toast.error("Failed to create user")
+                    break
+                default:
+                    break
+            }
+            hideAddModal()
+            await update()
+        }
+    }
+
+    const onUpdate: SubmitFunction = ({ form, data, action, submitter, cancel }) => {
+        const { name, classname, level } = Object.fromEntries(data)
+
+        if (name == "" || level == "Select") {
+            toast.error("Please fill out the form")
+            cancel()
+        }
+
+        if (level == "WALAS" && classname == "") {
+            toast.error("Please fill the class input")
+            cancel()
+        }
+
+        return async ({ result, update }) => {
+            switch (result.type){
+                case 'success':
+                    toast.success("Updated user!")
+                    break
+                case 'error':
+                    toast.error("Failed to update user")
+                    break
+                default:
+                    break
+            }
+            hideUpdateModal()
+            await update()
+        }
+    }
+
     export let data: PageData
 
     $: ({ user, userlist } = data)
 </script>
 
+<Toaster/>
 {#if deleteModalState}
 <div class="flex justify-center items-center fixed h-full w-full backdrop-blur-md z-50" transition:fade>
     <div class="-translate-y-28">
@@ -76,7 +168,7 @@
                     <div class="p-6 text-center">
                         <svg aria-hidden="true" class="mx-auto mb-4 text-gray-400 w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <h3 class="mb-5 text-lg font-normal text-gray-500 ">Are you sure you want to delete this user?</h3>
-                        <form method="POST" action="?/deleteUser">
+                        <form method="POST" action="?/deleteUser" use:enhance = {onDelete}>
                             <input type="text" name="uid" id="uid" bind:value={selectedUserId} class="hidden">
                             <button data-modal-hide="popup-modal" type="submit" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                                 Yes, I'm sure
@@ -101,24 +193,24 @@
         </button>
         <div class="px-6 py-6 lg:px-8">
             <h3 class="mb-4 text-xl font-medium text-gray-900">Add user</h3>
-            <form method="POST" class="space-y-6" action="?/createUser">
+            <form method="POST" class="space-y-6" action="?/createUser" use:enhance = {onAdd}>
                 <div>
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
-                    <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Adam Williams" required>
+                    <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Adam Williams" >
                 </div>
                 <div>
                     <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
-                    <input type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Adam" required>
+                    <input type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Adam" >
                 </div>
                 {#if levelValue == "WALAS"}
                 <div>
                     <label for="classname" class="block mb-2 text-sm font-medium text-gray-900">Class</label>
-                    <input type="text" name="classname" id="classname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="X TKJ" required>
+                    <input type="text" name="classname" id="classname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="X TKJ" >
                 </div>
                 {/if}
                 <div>
                     <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
-                    <input type="text" name="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="••••••••" required>
+                    <input type="text" name="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="••••••••" >
                 </div>
                 <div>
                     <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -142,12 +234,12 @@
                     {/if}
                 </div>
 
-                <input type="text" name="level" id="level" class="hidden" bind:value={levelValue} required>
-                {#if levelValue == "Select"}
+                <input type="text" name="level" id="level" class="hidden" bind:value={levelValue} >
+                <!-- {#if levelValue == "Select"}
                 <button type="button" on:click={() => alert("Please fill the form")} class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create User</button>
-                {:else}
+                {:else} -->
                 <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create User</button>
-                {/if}
+                <!-- {/if} -->
                 <!-- <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Create User</button> -->
             </form>
         </div>
@@ -165,15 +257,15 @@
         </button>
         <div class="px-6 py-6 lg:px-8">
             <h3 class="mb-4 text-xl font-medium text-gray-900">Update user</h3>
-            <form method="POST" class="space-y-6" action="?/updateUser">
+            <form method="POST" class="space-y-6" action="?/updateUser" use:enhance={onUpdate}>
                 <div>
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
-                    <input bind:value={updateModalData["name"]} type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Adam Williams" required>
+                    <input bind:value={updateModalData["name"]} type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="Adam Williams" >
                 </div>
                 {#if levelValue == "WALAS"}
                 <div>
                     <label for="classname" class="block mb-2 text-sm font-medium text-gray-900">Class</label>
-                    <input bind:value={updateModalData["class"]} type="text" name="classname" id="classname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="X TKJ" required>
+                    <input bind:value={updateModalData["class"]} type="text" name="classname" id="classname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 " placeholder="X TKJ" >
                 </div>
                 {/if}
                 <div>
@@ -216,6 +308,7 @@
             <TableHeadChild label="Level"/>
             <TableHeadChild label="Kelas"/>
             <TableHeadChild label="" buttons>
+                <input type="text" class="w-48 h-8 mr-3 px-2 bg-gray-100 hover:bg-gray-200 focus:bg-gray-200 font-light placeholder:font-light rounded" placeholder="Search" bind:value={search}/>
                 <button on:click={showAddModal} class="flex justify-center items-center hover:bg-slate-200 w-8 h-8 rounded">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -235,6 +328,7 @@
             </TableBodyChild>
             {#each userlist as a}
             {#if user.name != a.name}
+            {#if a.name.toLowerCase().includes(search.toLowerCase()) || a.level.toLowerCase().includes(search.toLowerCase()) || a.class?.toLowerCase().includes(search.toLowerCase())}
             <TableBodyChild name="{a.name}" data="{a.level},{a.class}" editable>
                 <div class="flex items-center justify-end">
                     <button on:click={() => showUpdateModal(a.id, a)} class="flex justify-center items-center bg-indigo-500 hover:bg-indigo-600 w-10 h-10 mx-2 text-white rounded">
@@ -249,6 +343,7 @@
                     </button>
                 </div>
             </TableBodyChild>
+            {/if}
             {/if}
             {/each}
         </TableBody>

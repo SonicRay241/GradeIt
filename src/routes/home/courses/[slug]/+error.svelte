@@ -1,11 +1,13 @@
 <script lang="ts">
     import bookImage from "$lib/asset/image/book.png"
     import { page } from "$app/stores"
+    import { fly } from "svelte/transition";
+    import { cubicInOut } from "svelte/easing";
 </script>
 
-<main class="flex items-center justify-center h-full">
+<main class="flex items-center justify-center h-full" in:fly="{{x:100, easing:cubicInOut, delay: 200}}" out:fly="{{x:100, easing:cubicInOut, duration:200}}">
     {#if $page.status == 404}
-    <div class="flex justify-center mt-24">
+    <div class="flex justify-center mt-24" in:fly="{{x:100, easing:cubicInOut, delay: 200}}" out:fly="{{x:100, easing:cubicInOut, duration:200}}">
         <div class="flex flex-col">
             <div>
                 <img src={bookImage} alt="Book" class="w-96 h-auto">
@@ -22,7 +24,7 @@
         </div>
     </div>
     {:else}
-    <div>
+    <div in:fly="{{x:100, easing:cubicInOut, delay: 200}}" out:fly="{{x:100, easing:cubicInOut, duration:200}}">
         <h1 class="text-9xl font-medium">
             {$page.status}
         </h1>
